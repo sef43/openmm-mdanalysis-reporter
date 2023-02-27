@@ -3,7 +3,7 @@
 This is an [OpenMM](https://openmm.org/) Reporter class that uses [MDAnalysis](https://www.mdanalysis.org/) for output. This means it can use any format supported by MDAnalysis.
 It also supports MDAnalysis selection strings.
 
-The reporter is called 'MDAReporter', oncee this package is installed it can be imported as:
+The reporter is called `MDAReporter`, once this package is installed it can be imported as:
 ```python
 from mdareporter import MDAReporter
 ```
@@ -11,12 +11,12 @@ from mdareporter import MDAReporter
 # Installation
 Pip:
 ```bash
-pip install git+
+pip install git+https://github.com/sef43/openmm-mdanalysis-reporter
 ```
 From source:
 ```bash
-git clone 
-cd 
+git clone https://github.com/sef43/openmm-mdanalysis-reporter.git
+cd openmm-mdanalysis-reporter
 pip install .
 ```
 
