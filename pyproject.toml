@@ -1,0 +1,17 @@
+[project]
+name = "openmm-mdanalysis-reporter"
+version = "0.0.1"
+description = "MDAnalysis trajectory reporter for OpenMM"
+authors = [
+    {name = "Stephen Farr", email="stephen.farr@ed.ac.uk"},
+]
+dependencies = [
+    "openmm",
+    "mdanalysis>=2.0.0",
+]
+
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+
