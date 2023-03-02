@@ -103,7 +103,8 @@ class MDAReporter(object):
         """
         if self._nextModel == 0:
             self._topology = simulation.topology
-            self._mdaUniverse = mda.Universe(simulation.topology, simulation,topology_format='OPENMMTOPOLOGY',format='OPENMMSIMULATION', dt=simulation.currentStep)
+            dt = simulation.integrator.getStepSize()*self._reportInterval
+            self._mdaUniverse = mda.Universe(simulation.topology, simulation,topology_format='OPENMMTOPOLOGY',format='OPENMMSIMULATION', dt=dt)
             if self._selection is not None:
                 self._atomGroup = self._mdaUniverse.select_atoms(self._selection)
             else:
