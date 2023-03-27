@@ -41,7 +41,7 @@ Additionally it supports the [MDAnalysis selection syntax](https://docs.mdanalys
 
 # using MDAnalysis selection string to output just Carbon atoms
 
-simulation.reporters.append(MDAReporter('traj.xyz',100, selection='name is C'))
+simulation.reporters.append(MDAReporter('traj.xyz',100, selection='name C'))
 ```
 
 # Example
