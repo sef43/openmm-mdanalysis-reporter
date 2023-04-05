@@ -1,5 +1,7 @@
 # OpenMM MDAnalysis Reporter
 
+[![CI](https://github.com/sef43/openmm-mdanalysis-reporter/actions/workflows/CI.yml/badge.svg)](https://github.com/sef43/openmm-mdanalysis-reporter/actions/workflows/CI.yml)
+
 *Currently a WIP but it should work* 
 
 This is an [OpenMM](https://openmm.org/) Reporter class that uses [MDAnalysis](https://www.mdanalysis.org/) for output. This means it can use any [format supported by MDAnalysis](https://userguide.mdanalysis.org/stable/formats/index.html).
