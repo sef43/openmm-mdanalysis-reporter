@@ -73,3 +73,27 @@ simulation.reporters.append(StateDataReporter(stdout, 100, step=True,
 simulation.step(1000)
     
 ```
+
+# Testing
+testsuite can be run using `pytest`
+```
+cd tests
+pytest
+```
+
+# Benchmarks
+A benchmarking script which writes trajectory snapshots every 10 steps for 1000 steps can be found at [example/benchmark.py](example/benchmark.py)
+
+The output on a M2 Macbook is:
+```
+OpenMM PDBReporter time =  7.989748208987294 s
+OpenMM DCDReporter time =  5.6639587499958 s
+MDAReporter format DCD time =  3.5682871250028256 s
+MDAReporter format NCDF time =  3.609358207992045 s
+MDAReporter format PDB time =  11.491382707987214 s
+MDAReporter format TRR time =  4.7894440419913735 s
+MDAReporter format XTC time =  4.086603666975861 s
+MDAReporter format XYZ time =  5.835725833981996 s
+```
+
+Excluding MDAReporter using PDB format the MDAReporter formats are all as fast, or faster than the OpenMM formats.
