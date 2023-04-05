@@ -1,0 +1,9 @@
+name: build
+channels:
+  - conda-forge
+dependencies:
+  - openmm
+  - mdanalysis
+  - numpy
+  - pytest
+  - pip
