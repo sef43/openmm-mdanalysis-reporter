@@ -39,7 +39,9 @@ USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 import MDAnalysis as mda
+from MDAnalysis.lib.mdamath import triclinic_box
 from openmm import unit
+import numpy as np
 
 class MDAReporter(object):
     """MDAReporter outputs a series of frames from a Simulation to any file format supported by MDAnalysis.
@@ -115,6 +117,11 @@ class MDAReporter(object):
         # update the positions, convert from OpenMM nm to MDAnalysis angstroms
         self._mdaUniverse.atoms.positions = state.getPositions(asNumpy=True).value_in_unit(unit.angstrom)
 
+        # update box vectors
+        boxVectors = state.getPeriodicBoxVectors(asNumpy=True).value_in_unit(unit.angstrom)
+        self._mdaUniverse.dimensions = triclinic_box(*boxVectors)
+        
+
         # write to the trajectory file
         self._mdaWriter.write(self._atomGroup)
 
@@ -123,3 +130,13 @@ class MDAReporter(object):
     def __del__(self):
         if self._mdaWriter:
             self._mdaWriter.close()
+
+
+def _sanitize_box_angles(angles):
+    """ Ensure box angles correspond to first quadrant
+
+    See `discussion on unitcell angles <https://github.com/MDAnalysis/mdanalysis/pull/2917/files#r620558575>`_
+    """
+    inverted = 180 - angles
+
+    return np.min(np.array([angles, inverted]), axis=0)
