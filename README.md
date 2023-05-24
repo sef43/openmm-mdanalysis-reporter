@@ -78,8 +78,8 @@ simulation.step(1000)
 
 # Testing
 testsuite can be run using `pytest`
-```bash
-cd mdareporter/tests
+```
+cd tests
 pytest
 ```
 
