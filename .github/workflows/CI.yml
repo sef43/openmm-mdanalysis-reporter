@@ -55,7 +55,7 @@ jobs:
       - name: Test
         shell: bash -l {0}
         run: |
-          cd tests
+          cd mdareporter/tests
           pytest -v 
 
       - run: echo "This job's status is ${{ job.status }}."
