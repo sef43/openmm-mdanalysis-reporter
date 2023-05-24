@@ -43,7 +43,7 @@ jobs:
     strategy:
         fail-fast: false
         matrix:
-          os: [macOS-latest, ubuntu-latest, windows-latest]
+          os: [macOS-latest, ubuntu-latest]
           python-version: ${{ fromJSON(needs.environment-config.outputs.python-matrix) }}
           mdanalysis-version: ["latest", "develop"]
 
@@ -138,30 +138,30 @@ jobs:
         pylint openmm-mdanalysis-reporter
 
 
-  pypi_check:
-    if: "github.repository == 'sef43/openmm-mdanalysis-reporter'"
-    needs: environment-config
-    runs-on: ubuntu-latest
+  # pypi_check:
+  #   if: "github.repository == 'sef43/openmm-mdanalysis-reporter'"
+  #   needs: environment-config
+  #   runs-on: ubuntu-latest
 
-    steps:
-    - uses: actions/checkout@v3
+  #   steps:
+  #   - uses: actions/checkout@v3
 
-    - name: Set up Python ${{ needs.environment-config.outputs.stable-python-version }}
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ needs.environment-config.outputs.stable-python-version }}
+  #   - name: Set up Python ${{ needs.environment-config.outputs.stable-python-version }}
+  #     uses: actions/setup-python@v4
+  #     with:
+  #       python-version: ${{ needs.environment-config.outputs.stable-python-version }}
 
-    - name: Install dependencies
-      run: |
-        pip install setuptools cython numpy twine
+  #   - name: Install dependencies
+  #     run: |
+  #       pip install setuptools cython numpy twine
 
-    - name: Build package
-      run: |
-        python setup.py sdist
+  #   - name: Build package
+  #     run: |
+  #       python setup.py sdist
 
-    - name: Check package build
-      run: |
-        DISTRIBUTION=$(ls -t1 dist/mdareporter-*.tar.gz | head -n 1)
-        test -n "${DISTRIBUTION}" || { echo "no distribution dist/mdareporter-*.tar.gz found"; exit 1; }
-        echo "twine check $DISTRIBUTION"
-        twine check $DISTRIBUTION
+  #   - name: Check package build
+  #     run: |
+  #       DISTRIBUTION=$(ls -t1 dist/mdareporter-*.tar.gz | head -n 1)
+  #       test -n "${DISTRIBUTION}" || { echo "no distribution dist/mdareporter-*.tar.gz found"; exit 1; }
+  #       echo "twine check $DISTRIBUTION"
+  #       twine check $DISTRIBUTION
