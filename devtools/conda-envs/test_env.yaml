@@ -1,0 +1,23 @@
+name: openmm-mdanalysis-reporter-test
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  # Base depends
+  - python
+  - pip
+  - openmm
+
+  # MDAnalysis
+  - MDAnalysis
+
+  # Testing
+  - pytest
+  - pytest-cov
+  - pytest-xdist
+  - codecov
+
+  # Pip-only installs
+  #- pip:
+  #  - codecov
+
