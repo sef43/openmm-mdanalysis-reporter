@@ -8,8 +8,8 @@ import numpy as np
 import pytest
 import tempfile
 
-THIS_DIR = os.path.dirname(os.path.abspath(__file__))
-VILLIN_FILENAME = os.path.join(THIS_DIR, 'villin.pdb')
+
+from mdareporter.data.files import VILLIN_PDB
 
 @pytest.mark.parametrize("file_ext", ["DCD", "NCDF","PDB", "TRR", "XTC", "XYZ"])
 def test_mdareporter(file_ext):
@@ -19,7 +19,7 @@ def test_mdareporter(file_ext):
         
 
         # run a OpenMM simulation
-        pdb = PDBFile(os.path.join(VILLIN_FILENAME))
+        pdb = PDBFile(os.path.join(VILLIN_PDB))
         forcefield = ForceField('amber14-all.xml', 'amber14/tip3pfb.xml')
         system = forcefield.createSystem(pdb.topology, nonbondedMethod=PME,
                 nonbondedCutoff=1*nanometer, constraints=HBonds)
@@ -71,7 +71,7 @@ def test_mdareporter_selection(file_ext):
         traj_name = os.path.join(tempdir, 'test_traj_selection.'+file_ext)
 
         # run a OpenMM simulation
-        pdb = PDBFile(VILLIN_FILENAME)
+        pdb = PDBFile(VILLIN_PDB)
         forcefield = ForceField('amber14-all.xml', 'amber14/tip3pfb.xml')
         system = forcefield.createSystem(pdb.topology, nonbondedMethod=PME,
                 nonbondedCutoff=1*nanometer, constraints=HBonds)
@@ -127,7 +127,7 @@ def test_mdareporter_boxvectors(file_ext):
         
 
         # run a OpenMM simulation
-        pdb = PDBFile(os.path.join(VILLIN_FILENAME))
+        pdb = PDBFile(os.path.join(VILLIN_PDB))
         forcefield = ForceField('amber14-all.xml', 'amber14/tip3pfb.xml')
         system = forcefield.createSystem(pdb.topology, nonbondedMethod=PME,
                 nonbondedCutoff=1*nanometer, constraints=HBonds)

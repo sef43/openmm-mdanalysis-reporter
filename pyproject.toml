@@ -1,16 +1,49 @@
-[project]
-name = "openmm-mdanalysis-reporter"
-version = "0.0.1"
-description = "MDAnalysis trajectory reporter for OpenMM"
-authors = [
-    {name = "Stephen Farr", email="stephen.farr@ed.ac.uk"},
-]
-dependencies = [
-    "mdanalysis>=2.0.0",
-]
-
 [build-system]
-requires = ["setuptools", "setuptools-scm"]
+requires = [
+  "setuptools >= 40.9.0",
+  "wheel",
+]
 build-backend = "setuptools.build_meta"
 
+[project]
+name = "openmm-mdanalysis-reporter"
+description = "MDAnalysis based reporter for OpenMM"
+license = {file = "LICENSE" }
+authors = [
+    {name = "Stephen Farr", email = "stephen.farr@ed.ac.uk"},
+]
+maintainers = [
+    {name = "Stephen Farr", email = "stephen.farr@ed.ac.uk"},
+]
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "MDAnalysis>=2.0.0",
+]
+keywords = [
+    "molecular simulations",
+]
+dynamic = [
+    "version",
+]
 
+[project.optional-dependencies]
+test = [
+    "pytest>=6.0",
+    "pytest-xdist>=2.5",
+    "pytest-cov>=3.0",
+]
+doc = [
+    "sphinx",
+    "sphinx_rtd_theme",
+]
+
+# [project.urls]
+# source = "https://github.com/sef43/openmm-mdanalysis-reporter"
+# documentation = "https://openmm-mdanalysis-reporter.readthedocs.io"
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+testpaths = [
+    "openmm-mdanalysis-reporter/tests",
+]
