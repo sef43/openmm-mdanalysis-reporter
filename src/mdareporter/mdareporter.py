@@ -120,7 +120,7 @@ class MDAReporter(object):
         # update box vectors
         boxVectors = state.getPeriodicBoxVectors(asNumpy=True).value_in_unit(unit.angstrom)
         self._mdaUniverse.dimensions = triclinic_box(*boxVectors)
-        
+        self._mdaUniverse.dimensions[:3] = _sanitize_box_angles(self._mdaUniverse.dimensions[:3])
 
         # write to the trajectory file
         self._mdaWriter.write(self._atomGroup)
@@ -130,6 +130,7 @@ class MDAReporter(object):
     def __del__(self):
         if self._mdaWriter:
             self._mdaWriter.close()
+
 
 
 def _sanitize_box_angles(angles):

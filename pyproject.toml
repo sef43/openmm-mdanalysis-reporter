@@ -6,7 +6,6 @@ authors = [
     {name = "Stephen Farr", email="stephen.farr@ed.ac.uk"},
 ]
 dependencies = [
-    "openmm",
     "mdanalysis>=2.0.0",
 ]
 
