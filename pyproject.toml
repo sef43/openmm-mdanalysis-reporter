@@ -13,4 +13,8 @@ dependencies = [
 requires = ["setuptools", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
+[tool.setuptools.packages.find]
+where = ["mdareporter"]
 
+[tool.setuptools.package-data]
+"*" = ["*.pdb"]
