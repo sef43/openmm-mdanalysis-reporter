@@ -88,8 +88,12 @@ simulation.step(1000)
 # Testing
 testsuite can be run using `pytest`
 ```
-cd tests
+cd mdareporter/tests
 pytest
+```
+or
+```
+pytest --pyargs mdareporter.tests   
 ```
 
 # Benchmarks
