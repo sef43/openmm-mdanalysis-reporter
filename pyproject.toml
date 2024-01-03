@@ -1,12 +1,12 @@
 [build-system]
 requires = [
   "setuptools >= 40.9.0",
-  "wheel",
+  "versioningit",
 ]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "openmm-mdanalysis-reporter"
+name = "mdareporter"
 description = "MDAnalysis based reporter for OpenMM"
 license = {file = "LICENSE" }
 authors = [
@@ -47,3 +47,43 @@ minversion = "6.0"
 testpaths = [
     "openmm-mdanalysis-reporter/tests",
 ]
+
+[tool.setuptools.packages]
+find = {namespaces = false, include=["mdareporter"], exclude=["devtools", "docs", "example"]}
+
+[tool.versioningit]
+default-version = "1+unknown"
+
+[tool.versioningit.vcs]
+method = "git"
+# the below line expects tags to look like '1.0.2'.
+# if prefixing with a v, e.g. 'v1.0.2', change it to ["v*"]
+match = ["*"]
+
+[tool.versioningit.format]
+distance = "{base_version}+{distance}.{vcs}{rev}"
+dirty = "{base_version}+{distance}.{vcs}{rev}.dirty"
+distance-dirty = "{base_version}+{distance}.{vcs}{rev}.dirty"
+
+[tool.coverage.run]
+omit = [
+    # Omit the tests
+    "*/tests/*",
+]
+
+[tool.coverage.report]
+exclude_also = [
+    "if TYPE_CHECKING:",
+]
+
+[tool.isort]
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+line_length = 80
+
+[tool.yapf]
+COLUMN_LIMIT = 80
+INDENT_WIDTH = 4
+USE_TABS = false
