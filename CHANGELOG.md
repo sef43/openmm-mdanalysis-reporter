@@ -22,6 +22,8 @@ The rules for this file:
 - @sef43, @richardjgowers, @orionarcher
 
 ### Added
+- Update tests to use serialized simulation
+- Format with black
 - Added writer_kwargs to `MDAReporter` instantiation
 - Added `MDAReporter` core logic and documentation
 
