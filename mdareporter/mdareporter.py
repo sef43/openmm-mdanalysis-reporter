@@ -48,7 +48,14 @@ class MDAReporter(object):
     To use it, create a MDAReporter, then add it to the Simulation's list of reporters.
     """
 
-    def __init__(self, file, reportInterval, enforcePeriodicBox=None, selection:str=None):
+    def __init__(
+        self,
+        file,
+        reportInterval,
+        enforcePeriodicBox=None,
+        selection: str = None,
+        writer_kwargs: dict = None
+    ):
         """Create a MDAReporter.
         Parameters
         ----------
@@ -64,6 +71,8 @@ class MDAReporter(object):
         selection : str
             MDAnalysis selection string (https://docs.mdanalysis.org/stable/documentation_pages/selections.html)
             which will be passed to MDAnalysis.Universe.select_atoms. If None (the default), all atoms will we selected.
+        writer_kwargs : dict
+            Additional keyword arguments to pass to the MDAnalysis.Writer object.
             
         """
         self._reportInterval = reportInterval
@@ -75,6 +84,7 @@ class MDAReporter(object):
         self._mdaWriter = None
         self._selection = selection
         self._atomGroup = None
+        self._writer_kwargs = writer_kwargs or {}
 
     def describeNextReport(self, simulation):
         """Get information about the next report this object will generate.
@@ -106,12 +116,22 @@ class MDAReporter(object):
         if self._nextModel == 0:
             self._topology = simulation.topology
             dt = simulation.integrator.getStepSize()*self._reportInterval
-            self._mdaUniverse = mda.Universe(simulation.topology, simulation,topology_format='OPENMMTOPOLOGY',format='OPENMMSIMULATION', dt=dt)
+            self._mdaUniverse = mda.Universe(
+                simulation.topology,
+                simulation,
+                topology_format='OPENMMTOPOLOGY',
+                format='OPENMMSIMULATION',
+                dt=dt
+            )
             if self._selection is not None:
                 self._atomGroup = self._mdaUniverse.select_atoms(self._selection)
             else:
                 self._atomGroup = self._mdaUniverse.atoms
-            self._mdaWriter = mda.Writer(self._filename, n_atoms=len(self._atomGroup))
+            self._mdaWriter = mda.Writer(
+                self._filename,
+                n_atoms=len(self._atomGroup),
+                **self._writer_kwargs
+            )
             self._nextModel += 1
 
         # update the positions, convert from OpenMM nm to MDAnalysis angstroms
