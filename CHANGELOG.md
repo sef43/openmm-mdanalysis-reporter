@@ -16,13 +16,13 @@ The rules for this file:
   * accompany each entry with github issue/PR number (Issue #xyz)
 -->
 
-## [Unreleased]
+## v0.1.1
 
 ### Authors
-<!-- GitHub usernames of contributors to this release -->
+- @sef43, @richardjgowers, @orionarcher
 
 ### Added
-<!-- New added features -->
+- Format with black
 
 ### Fixed
 <!-- Bug fixes -->
