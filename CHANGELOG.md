@@ -22,6 +22,7 @@ The rules for this file:
 - @sef43, @richardjgowers, @orionarcher
 
 ### Added
+- Serialized simulation used in testing to speed up
 - Added writer_kwargs to `MDAReporter` instantiation
 - Added `MDAReporter` core logic and documentation
 
