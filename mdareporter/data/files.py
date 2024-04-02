@@ -8,10 +8,7 @@ Use as ::
 
 """
 
-__all__ = [
-    "MDANALYSIS_LOGO",  # example file of MDAnalysis logo
-    "VILLIN_PDB"
-]
+__all__ = ["MDANALYSIS_LOGO", "VILLIN_PDB"]  # example file of MDAnalysis logo
 
 from pkg_resources import resource_filename
 

@@ -36,19 +36,20 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
-
-
 import MDAnalysis as mda
 from MDAnalysis.lib.mdamath import triclinic_box
 from openmm import unit
 import numpy as np
+
 
 class MDAReporter(object):
     """MDAReporter outputs a series of frames from a Simulation to any file format supported by MDAnalysis.
     To use it, create a MDAReporter, then add it to the Simulation's list of reporters.
     """
 
-    def __init__(self, file, reportInterval, enforcePeriodicBox=None, selection:str=None):
+    def __init__(
+        self, file, reportInterval, enforcePeriodicBox=None, selection: str = None
+    ):
         """Create a MDAReporter.
         Parameters
         ----------
@@ -64,7 +65,7 @@ class MDAReporter(object):
         selection : str
             MDAnalysis selection string (https://docs.mdanalysis.org/stable/documentation_pages/selections.html)
             which will be passed to MDAnalysis.Universe.select_atoms. If None (the default), all atoms will we selected.
-            
+
         """
         self._reportInterval = reportInterval
         self._enforcePeriodicBox = enforcePeriodicBox
@@ -91,7 +92,7 @@ class MDAReporter(object):
             energies respectively.  The final element specifies whether
             positions should be wrapped to lie in a single periodic box.
         """
-        steps = self._reportInterval - simulation.currentStep%self._reportInterval
+        steps = self._reportInterval - simulation.currentStep % self._reportInterval
         return (steps, True, False, False, False, self._enforcePeriodicBox)
 
     def report(self, simulation, state):
@@ -105,8 +106,14 @@ class MDAReporter(object):
         """
         if self._nextModel == 0:
             self._topology = simulation.topology
-            dt = simulation.integrator.getStepSize()*self._reportInterval
-            self._mdaUniverse = mda.Universe(simulation.topology, simulation,topology_format='OPENMMTOPOLOGY',format='OPENMMSIMULATION', dt=dt)
+            dt = simulation.integrator.getStepSize() * self._reportInterval
+            self._mdaUniverse = mda.Universe(
+                simulation.topology,
+                simulation,
+                topology_format="OPENMMTOPOLOGY",
+                format="OPENMMSIMULATION",
+                dt=dt,
+            )
             if self._selection is not None:
                 self._atomGroup = self._mdaUniverse.select_atoms(self._selection)
             else:
@@ -115,12 +122,18 @@ class MDAReporter(object):
             self._nextModel += 1
 
         # update the positions, convert from OpenMM nm to MDAnalysis angstroms
-        self._mdaUniverse.atoms.positions = state.getPositions(asNumpy=True).value_in_unit(unit.angstrom)
+        self._mdaUniverse.atoms.positions = state.getPositions(
+            asNumpy=True
+        ).value_in_unit(unit.angstrom)
 
         # update box vectors
-        boxVectors = state.getPeriodicBoxVectors(asNumpy=True).value_in_unit(unit.angstrom)
+        boxVectors = state.getPeriodicBoxVectors(asNumpy=True).value_in_unit(
+            unit.angstrom
+        )
         self._mdaUniverse.dimensions = triclinic_box(*boxVectors)
-        self._mdaUniverse.dimensions[:3] = _sanitize_box_angles(self._mdaUniverse.dimensions[:3])
+        self._mdaUniverse.dimensions[:3] = _sanitize_box_angles(
+            self._mdaUniverse.dimensions[:3]
+        )
 
         # write to the trajectory file
         self._mdaWriter.write(self._atomGroup)
@@ -132,9 +145,8 @@ class MDAReporter(object):
             self._mdaWriter.close()
 
 
-
 def _sanitize_box_angles(angles):
-    """ Ensure box angles correspond to first quadrant
+    """Ensure box angles correspond to first quadrant
 
     See `discussion on unitcell angles <https://github.com/MDAnalysis/mdanalysis/pull/2917/files#r620558575>`_
     """
