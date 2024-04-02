@@ -22,7 +22,7 @@ simulation.minimizeEnergy()
 pdb.writeFile(
     simulation.topology,
     simulation.context.getState(getPositions=True).getPositions(),
-    open("villin_simulation/output.pdb", "w"),
+    open("output.pdb", "w"),
 )
 system_xml = XmlSerializer.serialize(system)
 integrator_xml = XmlSerializer.serialize(integrator)
@@ -31,9 +31,9 @@ state_xml = XmlSerializer.serialize(
 )
 
 # write to files
-with open("villin_simulation/system.xml", "w") as f:
+with open("system.xml", "w") as f:
     f.write(system_xml)
-with open("villin_simulation/integrator.xml", "w") as f:
+with open("integrator.xml", "w") as f:
     f.write(integrator_xml)
-with open("villin_simulation/state.xml", "w") as f:
+with open("state.xml", "w") as f:
     f.write(state_xml)
