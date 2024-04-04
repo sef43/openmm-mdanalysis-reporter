@@ -36,9 +36,8 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
-
-
 import MDAnalysis as mda
+from MDAnalysis.lib.util import get_ext
 from MDAnalysis.lib.mdamath import triclinic_box
 from openmm import unit
 import numpy as np
@@ -102,7 +101,28 @@ class MDAReporter(object):
             positions should be wrapped to lie in a single periodic box.
         """
         steps = self._reportInterval - simulation.currentStep%self._reportInterval
-        return (steps, True, False, False, False, self._enforcePeriodicBox)
+
+        try:
+            # this will be called again inside mda.Writer but we need the ext here
+            root, ext = get_ext(self._filename)
+        except (TypeError, AttributeError):
+            errmsg = f'File format could not be guessed from "{self._filename}"'
+            raise ValueError(errmsg) from None
+
+        if ext in ["trr"]:
+            positions, velocities, forces = True, True, True
+        elif ext in ["ncdf", "nc"]:
+            positions = True
+            velocities = self._writer_kwargs.get("positions", False)
+            forces = self._writer_kwargs.get("forces", False)
+        elif ext in ["h5md"]:
+            positions = self._writer_kwargs.get("positions", True)
+            velocities = self._writer_kwargs.get("velocities", True)
+            forces = self._writer_kwargs.get("forces", True)
+        else:
+            positions, velocities, forces = True, False, False
+
+        return steps, positions, velocities, forces, False, self._enforcePeriodicBox
 
     def report(self, simulation, state):
         """Generate a report.

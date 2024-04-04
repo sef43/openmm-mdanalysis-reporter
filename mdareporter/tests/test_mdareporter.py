@@ -165,4 +165,22 @@ def test_mdareporter_boxvectors(file_ext, simulation):
         
         print("max error in positions is ",np.max(max_errors)," Angstrom")
 
-    
+
+@pytest.mark.parametrize("file_ext, expected_returns", [
+    ("dcd", (1, True, False, False)),
+    ("ncdf", (1, True, False, False)),
+    ("trr", (1, True, True, True)),
+    ("nc", (1, True, False, False)),
+    ("h5md", (1, True, True, True)),
+])
+def test_describenextreport(file_ext, expected_returns, simulation):
+    report_interval = 1
+    reporter = MDAReporter(f"output.{file_ext}", report_interval, enforcePeriodicBox=True)
+
+    simulation.currentStep = 0
+    steps, positions, velocities, forces, _, _ = reporter.describeNextReport(simulation)
+
+    assert steps == report_interval
+    assert positions == expected_returns[1]
+    assert velocities == expected_returns[2]
+    assert forces == expected_returns[3]
