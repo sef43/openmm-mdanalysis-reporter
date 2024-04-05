@@ -1,32 +1,42 @@
-from openmm.app import *
-from openmm import *
-from openmm.unit import *
+from openmm.app import Simulation, StateDataReporter, PDBFile
+from openmm import XmlSerializer
+from openmm.unit import angstrom, picosecond
 from sys import stdout
 from mdareporter import MDAReporter
 import MDAnalysis as mda
 import numpy as np
 import pytest
 import tempfile
+import os
 
 
-from mdareporter.data.files import VILLIN_PDB
+from mdareporter.data.files import VILLIN_PDB, INTEGRATOR_XML, SYSTEM_XML, STATE_XML
+
+
+@pytest.fixture
+def simulation():
+
+    pdb = PDBFile(VILLIN_PDB)
+    topology = pdb.getTopology()
+
+    system_xml = open(SYSTEM_XML).read()
+    system = XmlSerializer.deserialize(system_xml)
+
+    integrator_xml = open(INTEGRATOR_XML).read()
+    integrator = XmlSerializer.deserialize(integrator_xml)
+
+    state_xml = open(STATE_XML).read()
+    state = XmlSerializer.deserialize(state_xml)
+
+    simulation = Simulation(topology, system, integrator)
+    simulation.context.setState(state)
+    return simulation
 
 @pytest.mark.parametrize("file_ext", ["DCD", "NCDF","PDB", "TRR", "XTC", "XYZ"])
-def test_mdareporter(file_ext):
+def test_mdareporter(file_ext, simulation):
 
     with tempfile.TemporaryDirectory() as tempdir:
         traj_name = os.path.join(tempdir, 'test_traj.'+file_ext)
-        
-
-        # run a OpenMM simulation
-        pdb = PDBFile(os.path.join(VILLIN_PDB))
-        forcefield = ForceField('amber14-all.xml', 'amber14/tip3pfb.xml')
-        system = forcefield.createSystem(pdb.topology, nonbondedMethod=PME,
-                nonbondedCutoff=1*nanometer, constraints=HBonds)
-        integrator = LangevinMiddleIntegrator(300*kelvin, 1/picosecond, 0.004*picoseconds)
-        simulation = Simulation(pdb.topology, system, integrator)
-        simulation.context.setPositions(pdb.positions)
-        simulation.minimizeEnergy(maxIterations=10)
 
         # output a traj with M frames every N steps
         M=10
@@ -65,20 +75,10 @@ def test_mdareporter(file_ext):
 
     
 @pytest.mark.parametrize("file_ext", ["DCD", "NCDF","PDB", "TRR", "XTC", "XYZ"])
-def test_mdareporter_selection(file_ext):
+def test_mdareporter_selection(file_ext, simulation):
 
     with tempfile.TemporaryDirectory() as tempdir:
         traj_name = os.path.join(tempdir, 'test_traj_selection.'+file_ext)
-
-        # run a OpenMM simulation
-        pdb = PDBFile(VILLIN_PDB)
-        forcefield = ForceField('amber14-all.xml', 'amber14/tip3pfb.xml')
-        system = forcefield.createSystem(pdb.topology, nonbondedMethod=PME,
-                nonbondedCutoff=1*nanometer, constraints=HBonds)
-        integrator = LangevinMiddleIntegrator(300*kelvin, 1/picosecond, 0.004*picoseconds)
-        simulation = Simulation(pdb.topology, system, integrator)
-        simulation.context.setPositions(pdb.positions)
-        simulation.minimizeEnergy(maxIterations=10)
 
         # output a traj with M frames every N steps of just the protein
         M=10
@@ -120,24 +120,10 @@ def test_mdareporter_selection(file_ext):
 
 
 @pytest.mark.parametrize("file_ext", ["DCD", "NCDF","PDB", "TRR", "XTC", "XYZ"])
-def test_mdareporter_boxvectors(file_ext):
+def test_mdareporter_boxvectors(file_ext, simulation):
 
     with tempfile.TemporaryDirectory() as tempdir:
         traj_name = os.path.join(tempdir, 'test_traj.'+file_ext)
-        
-
-        # run a OpenMM simulation
-        pdb = PDBFile(os.path.join(VILLIN_PDB))
-        forcefield = ForceField('amber14-all.xml', 'amber14/tip3pfb.xml')
-        system = forcefield.createSystem(pdb.topology, nonbondedMethod=PME,
-                nonbondedCutoff=1*nanometer, constraints=HBonds)
-        integrator = LangevinMiddleIntegrator(300*kelvin, 1/picosecond, 0.004*picoseconds)
-        simulation = Simulation(pdb.topology, system, integrator)
-        simulation.context.setPositions(pdb.positions)
-
-        simulation.context.setPeriodicBoxVectors((5.0,0.0,0.0), (0.0,5.0,0.0), (0.0,1.0,5.0))
-
-        simulation.minimizeEnergy(maxIterations=10)
 
         # output a traj with M frames every N steps
         M=10
@@ -179,4 +165,22 @@ def test_mdareporter_boxvectors(file_ext):
         
         print("max error in positions is ",np.max(max_errors)," Angstrom")
 
-    
+
+@pytest.mark.parametrize("file_ext, expected_returns", [
+    ("dcd", (1, True, False, False)),
+    ("ncdf", (1, True, False, False)),
+    ("trr", (1, True, True, True)),
+    ("nc", (1, True, False, False)),
+    ("h5md", (1, True, True, True)),
+])
+def test_describenextreport(file_ext, expected_returns, simulation):
+    report_interval = 1
+    reporter = MDAReporter(f"output.{file_ext}", report_interval, enforcePeriodicBox=True)
+
+    simulation.currentStep = 0
+    steps, positions, velocities, forces, _, _ = reporter.describeNextReport(simulation)
+
+    assert steps == report_interval
+    assert positions == expected_returns[1]
+    assert velocities == expected_returns[2]
+    assert forces == expected_returns[3]

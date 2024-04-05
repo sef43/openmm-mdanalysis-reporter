@@ -16,13 +16,15 @@ The rules for this file:
   * accompany each entry with github issue/PR number (Issue #xyz)
 -->
 
-## [Unreleased]
+## v0.1.1
 
 ### Authors
-<!-- GitHub usernames of contributors to this release -->
+- @sef43, @richardjgowers, @orionarcher
 
 ### Added
-<!-- New added features -->
+- Serialized simulation used in testing to speed up
+- Added writer_kwargs to `MDAReporter` instantiation
+- Added `MDAReporter` core logic and documentation
 
 ### Fixed
 <!-- Bug fixes -->

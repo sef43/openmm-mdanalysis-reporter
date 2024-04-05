@@ -36,9 +36,8 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
-
-
 import MDAnalysis as mda
+from MDAnalysis.lib.util import get_ext
 from MDAnalysis.lib.mdamath import triclinic_box
 from openmm import unit
 import numpy as np
@@ -48,7 +47,14 @@ class MDAReporter(object):
     To use it, create a MDAReporter, then add it to the Simulation's list of reporters.
     """
 
-    def __init__(self, file, reportInterval, enforcePeriodicBox=None, selection:str=None):
+    def __init__(
+        self,
+        file,
+        reportInterval,
+        enforcePeriodicBox=None,
+        selection: str = None,
+        writer_kwargs: dict = None
+    ):
         """Create a MDAReporter.
         Parameters
         ----------
@@ -64,6 +70,8 @@ class MDAReporter(object):
         selection : str
             MDAnalysis selection string (https://docs.mdanalysis.org/stable/documentation_pages/selections.html)
             which will be passed to MDAnalysis.Universe.select_atoms. If None (the default), all atoms will we selected.
+        writer_kwargs : dict
+            Additional keyword arguments to pass to the MDAnalysis.Writer object.
             
         """
         self._reportInterval = reportInterval
@@ -75,6 +83,7 @@ class MDAReporter(object):
         self._mdaWriter = None
         self._selection = selection
         self._atomGroup = None
+        self._writer_kwargs = writer_kwargs or {}
 
     def describeNextReport(self, simulation):
         """Get information about the next report this object will generate.
@@ -92,7 +101,28 @@ class MDAReporter(object):
             positions should be wrapped to lie in a single periodic box.
         """
         steps = self._reportInterval - simulation.currentStep%self._reportInterval
-        return (steps, True, False, False, False, self._enforcePeriodicBox)
+
+        try:
+            # this will be called again inside mda.Writer but we need the ext here
+            root, ext = get_ext(self._filename)
+        except (TypeError, AttributeError):
+            errmsg = f'File format could not be guessed from "{self._filename}"'
+            raise ValueError(errmsg) from None
+
+        if ext in ["trr"]:
+            positions, velocities, forces = True, True, True
+        elif ext in ["ncdf", "nc"]:
+            positions = True
+            velocities = self._writer_kwargs.get("positions", False)
+            forces = self._writer_kwargs.get("forces", False)
+        elif ext in ["h5md"]:
+            positions = self._writer_kwargs.get("positions", True)
+            velocities = self._writer_kwargs.get("velocities", True)
+            forces = self._writer_kwargs.get("forces", True)
+        else:
+            positions, velocities, forces = True, False, False
+
+        return steps, positions, velocities, forces, False, self._enforcePeriodicBox
 
     def report(self, simulation, state):
         """Generate a report.
@@ -106,12 +136,22 @@ class MDAReporter(object):
         if self._nextModel == 0:
             self._topology = simulation.topology
             dt = simulation.integrator.getStepSize()*self._reportInterval
-            self._mdaUniverse = mda.Universe(simulation.topology, simulation,topology_format='OPENMMTOPOLOGY',format='OPENMMSIMULATION', dt=dt)
+            self._mdaUniverse = mda.Universe(
+                simulation.topology,
+                simulation,
+                topology_format='OPENMMTOPOLOGY',
+                format='OPENMMSIMULATION',
+                dt=dt
+            )
             if self._selection is not None:
                 self._atomGroup = self._mdaUniverse.select_atoms(self._selection)
             else:
                 self._atomGroup = self._mdaUniverse.atoms
-            self._mdaWriter = mda.Writer(self._filename, n_atoms=len(self._atomGroup))
+            self._mdaWriter = mda.Writer(
+                self._filename,
+                n_atoms=len(self._atomGroup),
+                **self._writer_kwargs
+            )
             self._nextModel += 1
 
         # update the positions, convert from OpenMM nm to MDAnalysis angstroms

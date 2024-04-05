@@ -16,4 +16,8 @@ __all__ = [
 from pkg_resources import resource_filename
 
 MDANALYSIS_LOGO = resource_filename(__name__, "mda.txt")
-VILLIN_PDB = resource_filename(__name__, "villin.pdb")
+VILLIN_PDB = resource_filename(__name__, "villin_simulation/villin.pdb")
+INTEGRATOR_XML = resource_filename(__name__, "villin_simulation/integrator.xml")
+SYSTEM_XML = resource_filename(__name__, "villin_simulation/system.xml")
+STATE_XML = resource_filename(__name__, "villin_simulation/state.xml")
+
