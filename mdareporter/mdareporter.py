@@ -113,7 +113,7 @@ class MDAReporter(object):
             positions, velocities, forces = True, True, True
         elif ext in ["ncdf", "nc"]:
             positions = True
-            velocities = self._writer_kwargs.get("positions", False)
+            velocities = self._writer_kwargs.get("velocities", False)
             forces = self._writer_kwargs.get("forces", False)
         elif ext in ["h5md"]:
             positions = self._writer_kwargs.get("positions", True)
